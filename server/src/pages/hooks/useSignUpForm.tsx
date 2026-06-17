@@ -45,6 +45,7 @@ const useSignUpForm = ({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [accessKey, setAccessKey] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [attributeValues, setAttributeValues] = useState<Record<string, string>>({})
@@ -58,6 +59,7 @@ const useSignUpForm = ({
         email,
         password,
         confirmPassword,
+        accessKey,
         firstName,
         lastName,
       } as Record<string, string>
@@ -68,7 +70,7 @@ const useSignUpForm = ({
 
       return val
     },
-    [email, password, confirmPassword, firstName, lastName, attributeValues, userAttributes],
+    [email, password, confirmPassword, accessKey, firstName, lastName, attributeValues, userAttributes],
   )
 
   const getSignUpInfo = useCallback(
@@ -105,6 +107,7 @@ const useSignUpForm = ({
         email: emailField(locale),
         password: passwordField(locale),
         confirmPassword: confirmPasswordField(locale),
+        accessKey: requiredField(locale),
         firstName: initialProps.namesIsRequired
           ? string().required(validateError.firstNameIsEmpty[locale])
           : string(),
@@ -132,7 +135,7 @@ const useSignUpForm = ({
   )
 
   const handleChange = (
-    name: 'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName' | number,
+    name: 'email' | 'password' | 'confirmPassword' | 'accessKey' | 'firstName' | 'lastName' | number,
     value: string | Record<string, string>,
   ) => {
     onSubmitError(null)
@@ -145,6 +148,9 @@ const useSignUpForm = ({
       break
     case 'confirmPassword':
       setConfirmPassword(value as string)
+      break
+    case 'accessKey':
+      setAccessKey(value as string)
       break
     case 'firstName':
       setFirstName(value as string)
@@ -185,6 +191,7 @@ const useSignUpForm = ({
             lastName: initialProps.enableNames ? lastName : undefined,
             email,
             password,
+            accessKey,
             attributes: userAttributes.length ? attributeValues : undefined,
             ...parseAuthorizeBaseValues(
               params,
@@ -216,6 +223,7 @@ const useSignUpForm = ({
       onSwitchView,
       email,
       password,
+      accessKey,
       firstName,
       lastName,
       errors,

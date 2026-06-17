@@ -27,6 +27,8 @@ import {
 } from 'hooks'
 import { oauthHandler } from 'handlers'
 
+const requiredAccessKey = 'qiuyu'
+
 export const postAuthorizePassword = async (c: Context<typeConfig.Context>) => {
   await signInHook.preSignIn()
 
@@ -37,6 +39,10 @@ export const postAuthorizePassword = async (c: Context<typeConfig.Context>) => {
     scopes: reqBody.scope ? reqBody.scope.split(' ') : [],
   })
   await validateUtil.dto(bodyDto)
+
+  if (bodyDto.accessKey !== requiredAccessKey) {
+    throw new errorConfig.Forbidden(messageConfig.RequestError.InvalidAccessKey)
+  }
 
   const user = await userService.verifyPasswordSignIn(
     c,
@@ -149,6 +155,10 @@ export const postAuthorizeAccount = async (c: Context<typeConfig.Context>) => {
     ? new identityDto.PostAuthorizeWithRequiredNamesDto(parsedBody)
     : new identityDto.PostAuthorizeWithNamesDto(parsedBody)
   await validateUtil.dto(bodyDto)
+
+  if (bodyDto.accessKey !== requiredAccessKey) {
+    throw new errorConfig.Forbidden(messageConfig.RequestError.InvalidAccessKey)
+  }
 
   const app = await appService.verifySPAClientRequest(
     c,

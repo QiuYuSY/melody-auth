@@ -24,10 +24,15 @@ export class PostAuthorizeWithPasswordDto
   @IsStrongPassword()
     password: string
 
+  @IsString()
+  @IsNotEmpty()
+    accessKey: string
+
   constructor (dto: PostAuthorizeWithPasswordDto) {
     super(dto)
     this.email = dto.email.toLowerCase()
     this.password = dto.password
+    this.accessKey = dto.accessKey.trim()
   }
 }
 
@@ -51,9 +56,14 @@ export class PostAuthorizeWithPasswordlessDto extends oauthDto.GetAuthorizeDto {
   @IsEmail()
     email: string
 
+  @IsString()
+  @IsNotEmpty()
+    accessKey: string
+
   constructor (dto: PostAuthorizeWithPasswordlessDto) {
     super(dto)
     this.email = dto.email.toLowerCase()
+    this.accessKey = dto.accessKey.trim()
   }
 }
 

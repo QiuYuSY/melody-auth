@@ -12,7 +12,7 @@ import { userAttributeModel } from 'models'
 export interface SignUpProps {
   locale: typeConfig.Locale;
   onSubmit: (e: Event) => void;
-  onChange: (name: 'email' | 'password' | 'confirmPassword' | 'firstName' | 'lastName' | number, value: string) => void;
+  onChange: (name: 'email' | 'password' | 'confirmPassword' | 'accessKey' | 'firstName' | 'lastName' | number, value: string) => void;
   values: Record<string, string>;
   errors: Record<string | number, string | undefined>;
   submitError: string | null;
@@ -76,6 +76,18 @@ const SignUp = ({
             autoComplete='new-password'
             onChange={(value) => onChange(
               'confirmPassword',
+              value,
+            )}
+          />
+          <PasswordField
+            label='Access Key'
+            required
+            name='accessKey'
+            value={values.accessKey}
+            error={errors.accessKey}
+            autoComplete='off'
+            onChange={(value) => onChange(
+              'accessKey',
               value,
             )}
           />

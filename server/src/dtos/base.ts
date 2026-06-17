@@ -9,9 +9,14 @@ export class SignInDto {
   @IsStrongPassword()
     password: string
 
+  @IsString()
+  @IsNotEmpty()
+    accessKey: string
+
   constructor (dto: SignInDto) {
     this.email = dto.email.toLowerCase()
     this.password = dto.password
+    this.accessKey = dto.accessKey.trim()
   }
 }
 

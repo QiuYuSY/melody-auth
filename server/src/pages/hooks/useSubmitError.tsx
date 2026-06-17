@@ -57,6 +57,12 @@ const useSubmitError = ({
         msg = requestError.authCodeVerifierLocked[locale]
       } else if (errorString.indexOf(messageConfig.RequestError.EmailTaken) !== -1) {
         msg = requestError.emailTaken[locale]
+      } else if (errorString.indexOf(messageConfig.RequestError.InvalidAccessKey) !== -1) {
+        msg = locale === 'fr'
+          ? 'Clé d’accès invalide.'
+          : locale === 'zh'
+            ? '访问密钥无效。'
+            : 'Invalid access key.'
       } else if (errorString.indexOf(messageConfig.RequestError.WrongCode) !== -1) {
         msg = requestError.wrongCode[locale]
       } else if (errorString.indexOf(messageConfig.RequestError.RequireDifferentPassword) !== -1) {

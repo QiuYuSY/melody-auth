@@ -7,6 +7,7 @@ import {
 } from 'configs'
 import {
   validate, emailField, passwordField,
+  requiredField,
 } from 'pages/tools/form'
 import { View } from 'pages/hooks'
 import {
@@ -32,6 +33,7 @@ const useSignInForm = ({
 }: UseSignInFormProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [accessKey, setAccessKey] = useState('')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPasswordlessSigningIn, setIsPasswordlessSigningIn] = useState(false)
@@ -40,19 +42,22 @@ const useSignInForm = ({
   const [touched, setTouched] = useState({
     email: false,
     password: false,
+    accessKey: false,
   })
 
   const values = useMemo(
     () => ({
       email,
       password,
+      accessKey,
     }),
-    [email, password],
+    [email, password, accessKey],
   )
 
   const signInSchema = object({
     email: emailField(locale),
     password: passwordField(locale),
+    accessKey: requiredField(locale),
   })
 
   const errors = validate(
@@ -61,7 +66,7 @@ const useSignInForm = ({
   )
 
   const handleChange = (
-    name: 'email' | 'password', value: string,
+    name: 'email' | 'password' | 'accessKey', value: string,
   ) => {
     onSubmitError(null)
     switch (name) {
@@ -70,6 +75,9 @@ const useSignInForm = ({
       break
     case 'password':
       setPassword(value)
+      break
+    case 'accessKey':
+      setAccessKey(value)
       break
     }
   }
@@ -80,6 +88,7 @@ const useSignInForm = ({
       setTouched({
         email: true,
         password: true,
+        accessKey: true,
       })
 
       if (Object.values(errors).some((error) => error !== undefined)) {
@@ -99,6 +108,7 @@ const useSignInForm = ({
           body: JSON.stringify({
             email,
             password,
+            accessKey,
             ...parseAuthorizeBaseValues(
               params,
               locale,
@@ -121,7 +131,7 @@ const useSignInForm = ({
           setIsSubmitting(false)
         })
     },
-    [params, locale, onSubmitError, onSwitchView, email, password, errors],
+    [params, locale, onSubmitError, onSwitchView, email, password, accessKey, errors],
   )
 
   const handlePasswordlessSignIn = useCallback(
@@ -130,9 +140,10 @@ const useSignInForm = ({
       setTouched({
         email: true,
         password: false,
+        accessKey: true,
       })
 
-      if (errors.email !== undefined) {
+      if (errors.email !== undefined || errors.accessKey !== undefined) {
         return
       }
 
@@ -148,6 +159,7 @@ const useSignInForm = ({
           },
           body: JSON.stringify({
             email,
+            accessKey,
             ...parseAuthorizeBaseValues(
               params,
               locale,
@@ -190,7 +202,7 @@ const useSignInForm = ({
           setIsPasswordlessSigningIn(false)
         })
     },
-    [params, locale, onSubmitError, onSwitchView, email, errors, usePasswordlessAsMagicLink],
+    [params, locale, onSubmitError, onSwitchView, email, accessKey, errors, usePasswordlessAsMagicLink],
   )
 
   return {
@@ -198,6 +210,7 @@ const useSignInForm = ({
     errors: {
       email: touched.email ? errors.email : undefined,
       password: touched.password ? errors.password : undefined,
+      accessKey: touched.accessKey ? errors.accessKey : undefined,
     },
     handleChange,
     handleSubmit,

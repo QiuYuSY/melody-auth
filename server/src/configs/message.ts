@@ -40,6 +40,7 @@ export enum ConfigError {
 }
 
 export enum RequestError {
+  InvalidAccessKey = 'Invalid access key provided',
   NotSpaTypeApp = 'A SPA request sent to a non-SPA app',
   NotS2sTypeApp = 'A S2S request sent to a non-S2S app',
   WrongS2sClientSecret = 'Wrong S2S client secret provided',
