@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.24" />
+    <style>
+      :root {
+        --vp-c-bg: #fff;
+      }
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
+      }
+
+      html,
+      body {
+        background-color: var(--vp-c-bg);
+      }
+    </style>
+    <script>
+      const useChoice = localStorage.getItem('vuepress-color-scheme')
+      const systemStatus =
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (useChoice === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (useChoice === 'dark' || systemStatus) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <title>Melody Auth</title><meta name="description" content="Effortless OAuth and Authentication, Built for Flexibility and Control.">
+    <link rel="preload" href="/assets/style-C2JCxPSn.css" as="style"><link rel="stylesheet" href="/assets/style-C2JCxPSn.css">
+    <link rel="modulepreload" href="/assets/app-e6pAgUvc.js"><link rel="modulepreload" href="/assets/404.html-BoUiUaeY.js">
+    <link rel="prefetch" href="/assets/CLAUDE.html-DoEDnchP.js" as="script"><link rel="prefetch" href="/assets/index.html-DRDdhiD-.js" as="script"><link rel="prefetch" href="/assets/admin-panel-setup.html-UO5gfORN.js" as="script"><link rel="prefetch" href="/assets/angular-sdk.html-DEAvYjb7.js" as="script"><link rel="prefetch" href="/assets/app-banners.html-Cgzg6asO.js" as="script"><link rel="prefetch" href="/assets/auth-server-configuration.html-BIs7ftpS.js" as="script"><link rel="prefetch" href="/assets/auth-server-setup.html-DPbeH48G.js" as="script"><link rel="prefetch" href="/assets/authentication.html-DsPO1NUz.js" as="script"><link rel="prefetch" href="/assets/branding.html-CXWlfuck.js" as="script"><link rel="prefetch" href="/assets/deployment-pipelines.html-CQAdWWVl.js" as="script"><link rel="prefetch" href="/assets/email-provider-setup.html-DjeJo-88.js" as="script"><link rel="prefetch" href="/assets/embedded-auth-api.html-CX9C7boR.js" as="script"><link rel="prefetch" href="/assets/feature-overview.html-tFK4q8_y.js" as="script"><link rel="prefetch" href="/assets/impersonation.html-BuN5II1x.js" as="script"><link rel="prefetch" href="/assets/jwt-and-jwks.html-D_GrZn6N.js" as="script"><link rel="prefetch" href="/assets/jwt-secret-rotate.html-8MGlwPBh.js" as="script"><link rel="prefetch" href="/assets/localization.html-BAz3uZ7-.js" as="script"><link rel="prefetch" href="/assets/log-management.html-DHEVCE00.js" as="script"><link rel="prefetch" href="/assets/mfa-setup.html-CD4EcIIo.js" as="script"><link rel="prefetch" href="/assets/nextjs-sdk.html-BnOe7RUv.js" as="script"><link rel="prefetch" href="/assets/oidc-sso-setup.html-tAkXzl9l.js" as="script"><link rel="prefetch" href="/assets/org-groups.html-7HA1oA7E.js" as="script"><link rel="prefetch" href="/assets/organizations.html-HF2Z8Zl_.js" as="script"><link rel="prefetch" href="/assets/policies.html-CCHSiVjm.js" as="script"><link rel="prefetch" href="/assets/rbac.html-Bds3MoCB.js" as="script"><link rel="prefetch" href="/assets/react-sdk.html-2ARRbuVX.js" as="script"><link rel="prefetch" href="/assets/s2s-api.html-bsRTCl8w.js" as="script"><link rel="prefetch" href="/assets/saml-sso-setup.html-D5zcR7XN.js" as="script"><link rel="prefetch" href="/assets/screenshots.html-BNoUfMNW.js" as="script"><link rel="prefetch" href="/assets/sms-provider-setup.html-BFq6oDeR.js" as="script"><link rel="prefetch" href="/assets/social-sign-in-provider-setup.html-BnjmBcub.js" as="script"><link rel="prefetch" href="/assets/user-attributes.html-BTI6zrIi.js" as="script"><link rel="prefetch" href="/assets/user-invite.html-D9L2Nq5J.js" as="script"><link rel="prefetch" href="/assets/vue-sdk.html-qOMeeSxL.js" as="script"><link rel="prefetch" href="/assets/web-sdk.html-BPb8mstB.js" as="script"><link rel="prefetch" href="/assets/index.html-C_h3fxo0.js" as="script"><link rel="prefetch" href="/assets/admin-panel-setup.html-vk6IvlWm.js" as="script"><link rel="prefetch" href="/assets/angular-sdk.html-D_iX569B.js" as="script"><link rel="prefetch" href="/assets/app-banners.html-Dj0IRH-F.js" as="script"><link rel="prefetch" href="/assets/auth-server-configuration.html-eme1jUxB.js" as="script"><link rel="prefetch" href="/assets/auth-server-setup.html-DHy0ZnaL.js" as="script"><link rel="prefetch" href="/assets/authentication.html-C9N13OXV.js" as="script"><link rel="prefetch" href="/assets/branding.html-C7pBbXdO.js" as="script"><link rel="prefetch" href="/assets/deployment-pipelines.html-BZa3z3rW.js" as="script"><link rel="prefetch" href="/assets/email-provider-setup.html-BbV2QQbG.js" as="script"><link rel="prefetch" href="/assets/embedded-auth-api.html-DzjDSmJW.js" as="script"><link rel="prefetch" href="/assets/impersonation.html-Bf9pCR-l.js" as="script"><link rel="prefetch" href="/assets/jwt-and-jwks.html-O3V3iXIY.js" as="script"><link rel="prefetch" href="/assets/jwt-secret-rotate.html-CRIPYFzd.js" as="script"><link rel="prefetch" href="/assets/localization.html-0VLAALk-.js" as="script"><link rel="prefetch" href="/assets/log-management.html-LOMW6VhN.js" as="script"><link rel="prefetch" href="/assets/mfa-setup.html-DKgQadEL.js" as="script"><link rel="prefetch" href="/assets/nextjs-sdk.html-DQnDNvyf.js" as="script"><link rel="prefetch" href="/assets/oidc-sso-setup.html-DVHwn_bt.js" as="script"><link rel="prefetch" href="/assets/org-groups.html-e2yCPDU_.js" as="script"><link rel="prefetch" href="/assets/organizations.html-ALWX5Cjh.js" as="script"><link rel="prefetch" href="/assets/policies.html-DljyLFMZ.js" as="script"><link rel="prefetch" href="/assets/rbac.html-rI2wsGwp.js" as="script"><link rel="prefetch" href="/assets/react-sdk.html-DnUxK7WN.js" as="script"><link rel="prefetch" href="/assets/s2s-api.html-BF_8uuuN.js" as="script"><link rel="prefetch" href="/assets/saml-sso-setup.html-DciPRJMH.js" as="script"><link rel="prefetch" href="/assets/screenshots.html-Di8k2qIR.js" as="script"><link rel="prefetch" href="/assets/sms-provider-setup.html-BiuXDQKw.js" as="script"><link rel="prefetch" href="/assets/social-sign-in-provider-setup.html-DbmNiNPR.js" as="script"><link rel="prefetch" href="/assets/user-attributes.html-DU8JdNYS.js" as="script"><link rel="prefetch" href="/assets/user-invite.html-AOYBJNXt.js" as="script"><link rel="prefetch" href="/assets/vue-sdk.html-NllDYPP7.js" as="script"><link rel="prefetch" href="/assets/web-sdk.html-CwlNlpaE.js" as="script">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="vp-theme-container" vp-container data-v-33d3430e><main class="page" data-v-33d3430e><div vp-content data-v-33d3430e><h1 data-v-33d3430e>404</h1><blockquote data-v-33d3430e>There&#39;s nothing here.</blockquote><a class="route-link" href="/" data-v-33d3430e>Take me home</a></div></main></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/assets/app-e6pAgUvc.js" defer></script>
+  </body>
+</html>
