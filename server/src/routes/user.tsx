@@ -56,6 +56,12 @@ userRoutes.get(
   userHandler.getUsers,
 )
 
+userRoutes.post(
+  `${BaseRoute}`,
+  authMiddleware.s2sWriteUser,
+  userHandler.postUser,
+)
+
 /**
  * @swagger
  * /api/v1/users/{authId}:

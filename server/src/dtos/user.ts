@@ -41,6 +41,55 @@ export class PostUserInvitationDto {
   }
 }
 
+export class PostUserDto {
+  @IsEmail()
+    email: string
+
+  @IsStrongPassword()
+  @IsNotEmpty()
+    password: string
+
+  @IsString()
+  @IsOptional()
+    firstName?: string
+
+  @IsString()
+  @IsOptional()
+    lastName?: string
+
+  @IsString()
+  @IsOptional()
+    locale?: string
+
+  @IsString()
+  @IsOptional()
+    orgSlug?: string
+
+  @IsBoolean()
+  @IsOptional()
+    emailVerified?: boolean
+
+  @IsBoolean()
+  @IsOptional()
+    isActive?: boolean
+
+  @IsString({ each: true })
+  @IsOptional()
+    roles?: string[]
+
+  constructor (dto: PostUserDto) {
+    this.email = dto.email?.trim().toLowerCase() ?? ''
+    this.password = dto.password ?? ''
+    this.firstName = dto.firstName
+    this.lastName = dto.lastName
+    this.locale = dto.locale
+    this.orgSlug = dto.orgSlug
+    this.emailVerified = dto.emailVerified
+    this.isActive = dto.isActive
+    this.roles = dto.roles
+  }
+}
+
 export class PostResendUserInvitationDto {
   @IsString()
   @IsOptional()

@@ -55,6 +55,95 @@ export const getUser = async (c: Context<typeConfig.Context>) => {
   return c.json({ user })
 }
 
+export const postUser = async (c: Context<typeConfig.Context>) => {
+  const reqBody = await c.req.json()
+  const bodyDto = new userDto.PostUserDto(reqBody)
+  await validateUtil.dto(bodyDto)
+
+  const {
+    SUPPORTED_LOCALES: supportedLocales,
+    ENABLE_NAMES: enableNames,
+    ENABLE_ORG: enableOrg,
+  } = env(c)
+
+  const existingUser = await userModel.getNormalUserByEmail(
+    c.env.DB,
+    bodyDto.email,
+  )
+  if (existingUser) {
+    loggerUtil.triggerLogger(
+      c,
+      loggerUtil.LoggerLevel.Warn,
+      messageConfig.RequestError.EmailTaken,
+    )
+    throw new errorConfig.Forbidden(messageConfig.RequestError.EmailTaken)
+  }
+
+  const orgSlug = bodyDto.orgSlug?.trim() ?? ''
+  let org = null
+  if (orgSlug) {
+    org = await orgService.getOrgBySlug(
+      c,
+      orgSlug,
+    )
+    if (!org) {
+      throw new errorConfig.NotFound(messageConfig.RequestError.NoOrg)
+    }
+  }
+
+  const requestedRoles = Array.from(new Set(bodyDto.roles ?? []))
+  let targetRoles: roleModel.Record[] = []
+  if (requestedRoles.length) {
+    const allRoles = await roleModel.getAll(c.env.DB)
+    targetRoles = allRoles.filter((role) => requestedRoles.includes(role.name))
+    if (targetRoles.length !== requestedRoles.length) {
+      throw new errorConfig.NotFound(messageConfig.RequestError.RoleNotFound)
+    }
+  }
+
+  const password = await cryptoUtil.bcryptText(bodyDto.password)
+  const newUser = await userModel.create(
+    c.env.DB,
+    {
+      authId: crypto.randomUUID(),
+      orgSlug,
+      email: bodyDto.email,
+      socialAccountId: null,
+      socialAccountType: null,
+      password,
+      locale: (bodyDto.locale ?? supportedLocales[0]) as typeConfig.Locale,
+      otpSecret: cryptoUtil.genOtpSecret(),
+      firstName: bodyDto.firstName ?? null,
+      lastName: bodyDto.lastName ?? null,
+      emailVerified: bodyDto.emailVerified === false ? 0 : 1,
+      isActive: bodyDto.isActive === false ? 0 : 1,
+    },
+  )
+
+  for (const role of targetRoles) {
+    await userRoleModel.create(
+      c.env.DB,
+      {
+        userId: newUser.id,
+        roleId: role.id,
+      },
+    )
+  }
+
+  const roleNames = targetRoles.map((role) => role.name)
+  const apiRecord = userModel.convertToApiRecordFull(
+    newUser,
+    enableNames,
+    enableOrg,
+    roleNames,
+    org,
+    [],
+    undefined,
+  )
+
+  return c.json({ user: apiRecord })
+}
+
 export const getUserAppConsents = async (c: Context<typeConfig.Context>) => {
   const authId = c.req.param('authId') ?? ''
   const user = await userService.getUserByAuthId(
