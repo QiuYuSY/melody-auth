@@ -44,11 +44,11 @@ describe(
   'bcrypt helpers',
   () => {
     test(
-      'should generate password hashes with cost 12',
+      'should generate password hashes with cost 4',
       () => {
         const hash = bcryptText('Password1!')
 
-        expect(hash.split('$')[2]).toBe('12')
+        expect(hash.split('$')[2]).toBe('04')
         expect(bcryptCompare(
           'Password1!',
           hash,

@@ -131,7 +131,7 @@ export const verifyTotp = async (
 }
 
 export const bcryptText = (text: string) => {
-  const salt = bcrypt.genSaltSync(12)
+  const salt = bcrypt.genSaltSync(4)
   const hash = bcrypt.hashSync(
     text,
     salt,
