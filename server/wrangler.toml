@@ -89,12 +89,12 @@ ENABLE_SIGN_IN_LOG=false # Specify whether the user’s sign-in IP (only applica
 
 [[kv_namespaces]]
 binding = "KV"
-id = "7d9be060a7bc48919251b37caa7e1fcd" # Replace with your own KV ID
+id = "ea6a0a07cce04f51beb2e6b1ba873dcb" # Replace with your own KV ID
 
 [[d1_databases]]
 binding = "DB"
 database_name = "melody-auth"
-database_id = "8dc67df2-771d-4e73-9c16-d04341b9740e" # Replace with your own D1 ID
+database_id = "da0eb9f9-a26d-41cb-a383-7e6657bd9929" # Replace with your own D1 ID
 migrations_dir = "./migrations/sqlite"
 
 [assets]
