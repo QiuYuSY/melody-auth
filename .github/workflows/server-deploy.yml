@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +26,48 @@ jobs:
 
       - name: Build Server View
         run: cd server && npm run build
+
+      - name: Ensure Cloudflare KV secrets exist
+        working-directory: server
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          has_key() {
+            local key_name="$1"
+            local result
+            result="$(npx wrangler kv key list --prefix="$key_name" --binding=KV --remote)"
+            node -e 'const input = process.argv[1] || "[]"; const items = JSON.parse(input); process.exit(items.some((item) => item.name === process.argv[2]) ? 0 : 1)' "$result" "$key_name"
+          }
+
+          if ! has_key "sessionSecret"; then
+            echo "Initializing sessionSecret in Cloudflare KV"
+            npx wrangler kv key put sessionSecret "$(openssl rand -hex 20)" --binding=KV --remote
+          else
+            echo "sessionSecret already exists"
+          fi
+
+          jwt_public_exists=false
+          jwt_private_exists=false
+
+          if has_key "jwtPublicSecret"; then
+            jwt_public_exists=true
+          fi
+
+          if has_key "jwtPrivateSecret"; then
+            jwt_private_exists=true
+          fi
+
+          if [[ "$jwt_public_exists" == true && "$jwt_private_exists" == true ]]; then
+            echo "JWT signing keys already exist"
+          else
+            echo "Initializing JWT signing keys in Cloudflare KV"
+            openssl genpkey -algorithm RSA -out jwt_private_key.pem -pkeyopt rsa_keygen_bits:2048
+            openssl rsa -pubout -in jwt_private_key.pem -out jwt_public_key.pem
+            npx wrangler kv key put jwtPrivateSecret --path=jwt_private_key.pem --binding=KV --remote
+            npx wrangler kv key put jwtPublicSecret --path=jwt_public_key.pem --binding=KV --remote
+            rm -f jwt_private_key.pem jwt_public_key.pem
+          fi
 
       - name: Run Migration
         uses: cloudflare/wrangler-action@v3
