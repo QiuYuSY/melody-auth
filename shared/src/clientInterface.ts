@@ -29,6 +29,7 @@ export interface IdTokenBody {
   sub: string;
   azp: string;
   aud: string;
+  nonce?: string;
   exp: number;
   iat: number;
   email: string | null;

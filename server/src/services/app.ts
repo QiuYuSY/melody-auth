@@ -56,8 +56,8 @@ export const verifySPAClientRequest = async (
   const { EMBEDDED_AUTH_ORIGINS: allowedOrigins } = env(c)
 
   if (
-    !app.redirectUris.includes(requestUtil.stripEndingSlash(redirectUri)) &&
-    !allowedOrigins.includes(requestUtil.stripEndingSlash(redirectUri))
+    !app.redirectUris.includes(requestUtil.stripEndingSlash(redirectUri).toLowerCase()) &&
+    !allowedOrigins.includes(requestUtil.stripEndingSlash(redirectUri).toLowerCase())
   ) {
     loggerUtil.triggerLogger(
       c,

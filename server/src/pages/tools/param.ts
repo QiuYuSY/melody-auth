@@ -30,6 +30,7 @@ export interface AuthorizeParams {
   codeChallenge: string;
   codeChallengeMethod: string;
   org: string;
+  nonce: string;
   scope: string;
 }
 
@@ -49,6 +50,7 @@ export const getAuthorizeParams = (): AuthorizeParams => {
     codeChallenge: 'code_challenge' in params ? String(params.code_challenge) : '',
     codeChallengeMethod: 'code_challenge_method' in params ? String(params.code_challenge_method) : '',
     org: 'org' in params ? String(params.org) : '',
+    nonce: 'nonce' in params ? String(params.nonce) : '',
     scope: 'scope' in params ? String(params.scope) : '',
   }
 }

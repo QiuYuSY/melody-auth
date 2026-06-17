@@ -80,6 +80,32 @@ describe(
     )
 
     test(
+      'should preserve redirect uri casing while still validating it',
+      async () => {
+        const appRecord = await getApp(db)
+        const mixedCaseRedirectUri = 'https://external.auth.openai.com/sso/oidc/x56qYHjp0JZlLTwrmxvApuQDn/callback'
+
+        await db.prepare('update app set "redirectUris" = ? where id = 1').run(mixedCaseRedirectUri.toLowerCase())
+
+        const codeChallenge = 'abc'
+        const res = await app.request(
+          `${routeConfig.OauthRoute.Authorize}` +
+          `?client_id=${appRecord.clientId}` +
+          `&redirect_uri=${encodeURIComponent(mixedCaseRedirectUri)}` +
+          '&response_type=code&state=123&locale=en' +
+          '&scope=openid%20profile' +
+          `&code_challenge=${codeChallenge}` +
+          '&code_challenge_method=S256',
+          {},
+          mock(db),
+        )
+
+        expect(res.status).toBe(302)
+        expect(res.headers.get('Location')).toContain(encodeURIComponent(mixedCaseRedirectUri))
+      },
+    )
+
+    test(
       'should redirect to oidc sign in',
       async () => {
         process.env.OIDC_AUTH_PROVIDERS = ['Auth0'] as unknown as string
@@ -1167,6 +1193,56 @@ describe(
         })
 
         global.process.env.ENFORCE_ONE_MFA_ENROLLMENT = ['email', 'otp'] as unknown as string
+      },
+    )
+
+    test(
+      'should include nonce in id token when authorize request includes nonce',
+      async () => {
+        global.process.env.ENFORCE_ONE_MFA_ENROLLMENT = [] as unknown as string
+        process.env.ACCESS_KEY = 'abc' as unknown as string
+        await insertUsers(db)
+        const appRecord = await getApp(db)
+
+        const res = await app.request(
+          routeConfig.IdentityRoute.AuthorizePassword,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              ...(await postAuthorizeBody(appRecord)),
+              nonce: 'openai-test-nonce',
+              email: 'test@email.com',
+              password: 'Password1!',
+              accessKey: 'abc',
+              scope: 'profile openid offline_access',
+            }),
+          },
+          mock(db),
+        )
+        const json = await res.json() as { code: string }
+
+        const tokenRes = await app.request(
+          routeConfig.OauthRoute.Token,
+          {
+            method: 'POST',
+            body: new URLSearchParams({
+              grant_type: oauthDto.TokenGrantType.AuthorizationCode,
+              code: json.code,
+              code_verifier: 'abc',
+            }).toString(),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          },
+          mock(db),
+        )
+
+        const tokenJson = await tokenRes.json() as { id_token: string }
+        const idTokenBody = decode(tokenJson.id_token)
+        expect(idTokenBody.payload).toMatchObject({
+          nonce: 'openai-test-nonce',
+        })
+
+        global.process.env.ENFORCE_ONE_MFA_ENROLLMENT = ['email', 'otp'] as unknown as string
+        process.env.ACCESS_KEY = '' as unknown as string
       },
     )
 

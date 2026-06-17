@@ -26,6 +26,7 @@ export const parseAuthorizeBaseValues = (
     policy: params.policy,
     codeChallenge: params.codeChallenge,
     codeChallengeMethod: params.codeChallengeMethod,
+    nonce: params.nonce,
     locale,
     org: params.org,
     scope: params.scope,

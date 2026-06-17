@@ -65,8 +65,12 @@ export class CoreAuthorizeDto {
   @IsOptional()
     org?: string | undefined
 
+  @IsString()
+  @IsOptional()
+    nonce?: string | undefined
+
   constructor (dto: CoreAuthorizeDto) {
-    this.redirectUri = dto.redirectUri.toLowerCase()
+    this.redirectUri = dto.redirectUri.trim()
     this.clientId = dto.clientId
     this.codeChallenge = dto.codeChallenge || undefined
     this.codeChallengeMethod = dto.codeChallengeMethod
@@ -75,6 +79,7 @@ export class CoreAuthorizeDto {
     this.scopes = parseScopes(dto.scopes)
     this.locale = dto.locale
     this.org = dto.org
+    this.nonce = dto.nonce
 
     if (
       this.codeChallengeMethod === AuthorizeCodeChallengeMethod.Plain &&
