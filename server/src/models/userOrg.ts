@@ -87,3 +87,16 @@ export const remove = async (
   const result = await dbUtil.d1Run(stmt)
   return result.success
 }
+
+export const destroyByUser = async (
+  db: D1Database, userId: number,
+): Promise<true> => {
+  const stmt = dbUtil.d1DeleteQuery(
+    db,
+    TableName,
+    userId,
+    'userId',
+  )
+  const result = await dbUtil.d1Run(stmt)
+  return result.success
+}

@@ -92,3 +92,18 @@ export const destroy = async (
   if (!result.success) throw new errorConfig.InternalServerError()
   return true
 }
+
+export const destroyByUser = async (
+  db: D1Database,
+  userId: number,
+) => {
+  const stmt = dbUtil.d1DeleteQuery(
+    db,
+    TableName,
+    userId,
+    'userId',
+  )
+  const result = await dbUtil.d1Run(stmt)
+  if (!result.success) throw new errorConfig.InternalServerError()
+  return true
+}

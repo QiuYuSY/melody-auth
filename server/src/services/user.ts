@@ -12,7 +12,7 @@ import {
 } from 'dtos'
 import {
   orgModel, roleModel, userAppConsentModel, userAttributeModel, userAttributeValueModel,
-  userModel, userOrgGroupModel, userOrgModel, userRoleModel,
+  userModel, userOrgGroupModel, userOrgModel, userRoleModel, userPasskeyModel, signInLogModel,
 } from 'models'
 import {
   emailService, jwtService, kvService, roleService,
@@ -1592,11 +1592,39 @@ export const deleteUser = async (
     )
     throw new errorConfig.NotFound(messageConfig.RequestError.NoUser)
   }
-  await userModel.remove(
+  await userModel.unlinkByLinkedAuthId(
+    c.env.DB,
+    authId,
+  )
+  await userAppConsentModel.destroyByUser(
     c.env.DB,
     user.id,
   )
-  await userAppConsentModel.removeByUser(
+  await userRoleModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await userPasskeyModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await userOrgGroupModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await userOrgModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await userAttributeValueModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await signInLogModel.destroyByUser(
+    c.env.DB,
+    user.id,
+  )
+  await userModel.destroy(
     c.env.DB,
     user.id,
   )

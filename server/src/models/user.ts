@@ -517,6 +517,28 @@ export const remove = async (
   return true
 }
 
+export const destroy = async (
+  db: D1Database, id: number,
+): Promise<true> => {
+  const stmt = dbUtil.d1DeleteQuery(
+    db,
+    TableName,
+    id,
+  )
+
+  await dbUtil.d1Run(stmt)
+  return true
+}
+
+export const unlinkByLinkedAuthId = async (
+  db: D1Database, linkedAuthId: string,
+): Promise<true> => {
+  const query = `UPDATE ${TableName} SET "linkedAuthId" = null WHERE "linkedAuthId" = $1 AND "deletedAt" IS NULL`
+  const stmt = db.prepare(query).bind(linkedAuthId)
+  await dbUtil.d1Run(stmt)
+  return true
+}
+
 export const updateOrgSlug = async (
   db: D1Database, oldSlug: string, newSlug: string,
 ): Promise<true> => {

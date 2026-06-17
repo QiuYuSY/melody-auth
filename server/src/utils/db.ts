@@ -136,3 +136,13 @@ export const d1SoftDeleteQuery = (
   )
   return stmt
 }
+
+export const d1DeleteQuery = (
+  db: D1Database,
+  tableName: string,
+  id: number | string,
+  key?: string,
+): D1PreparedStatement => {
+  const query = `DELETE FROM ${tableName} WHERE "${key || 'id'}" = $1`
+  return db.prepare(query).bind(id)
+}

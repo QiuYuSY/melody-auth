@@ -2412,6 +2412,9 @@ describe(
       'should delete user',
       async () => {
         await insertUsers(db)
+        await db.prepare('insert into user_app_consent ("userId", "appId") values (?, ?)').run(1, 2)
+        await db.prepare('insert into user_role ("userId", "roleId") values (?, ?)').run(1, 1)
+        await db.prepare('insert into sign_in_log ("userId", "ip", "detail") values (?, ?, ?)').run(1, '127.0.0.1', null)
 
         const res = await app.request(
           `${BaseRoute}/1-1-1-1`,
@@ -2429,6 +2432,18 @@ describe(
           mock(db),
         )
         expect(checkRes.status).toBe(404)
+
+        const deletedUser = db.prepare('select * from "user" where "authId" = ?').get('1-1-1-1')
+        expect(deletedUser).toBeUndefined()
+
+        const deletedConsents = db.prepare('select * from user_app_consent where "userId" = ?').all(1)
+        expect(deletedConsents).toStrictEqual([])
+
+        const deletedRoles = db.prepare('select * from user_role where "userId" = ?').all(1)
+        expect(deletedRoles).toStrictEqual([])
+
+        const deletedLogs = db.prepare('select * from sign_in_log where "userId" = ?').all(1)
+        expect(deletedLogs).toStrictEqual([])
       },
     )
 
