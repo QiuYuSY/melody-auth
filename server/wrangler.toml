@@ -20,6 +20,7 @@ PRIVACY_POLICY_LINK="" # Display a link to your privacy policy on sign-up page
 # System
 SUPPORTED_LOCALES=['en', 'fr'] # There is built-in support for zh as well
 ENABLE_LOCALE_SELECTOR=true # If there is only one SUPPORTED_LOCALE, the locale selector will be disabled regardless of this setting.
+ACCESS_KEY="" # Shared access key required for sign-in and sign-up flows. Configure a real value in Cloudflare production variables/secrets.
 # EMAIL_PROVIDER_NAME="" # The name of your email provider. Available options are 'smtp', 'sendgrid', 'mailgun', 'brevo', 'resend', 'postmark'
 
 # Suppression
@@ -102,3 +103,4 @@ directory = "./dist/static"
 
 [observability]
 enabled = false # Set to true to enable Cloudflare workers logs. https://developers.cloudflare.com/workers/observability/logs/workers-logs/
+

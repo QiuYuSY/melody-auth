@@ -1,4 +1,5 @@
 export enum ConfigError {
+  NoAccessKey = 'Access key is not configured',
   NotSupposeToSendEmailMfa = 'An email mfa request triggered but the system is not supposed to send email mfa based on current setup',
   NotSupposeToSendSmsMfa = 'An sms mfa request triggered but the system is not supposed to send sms mfa based on current setup',
   SignUpNotEnabled = 'Sign up is not enabled or passwordless sign in is enabled',

@@ -13,7 +13,15 @@ import {
   validateUtil, loggerUtil,
 } from 'utils'
 
-const requiredAccessKey = 'qiuyu'
+const verifyAccessKey = (accessKey: string, requiredAccessKey?: string) => {
+  if (!requiredAccessKey) {
+    throw new errorConfig.Forbidden(messageConfig.ConfigError.NoAccessKey)
+  }
+
+  if (accessKey !== requiredAccessKey) {
+    throw new errorConfig.Forbidden(messageConfig.RequestError.InvalidAccessKey)
+  }
+}
 
 export const postAuthorizePasswordless = async (c: Context<typeConfig.Context>) => {
   const reqBody = await c.req.json()
@@ -24,9 +32,10 @@ export const postAuthorizePasswordless = async (c: Context<typeConfig.Context>) 
   })
   await validateUtil.dto(bodyDto)
 
-  if (bodyDto.accessKey !== requiredAccessKey) {
-    throw new errorConfig.Forbidden(messageConfig.RequestError.InvalidAccessKey)
-  }
+  verifyAccessKey(
+    bodyDto.accessKey,
+    env(c).ACCESS_KEY,
+  )
 
   const user = await userService.getPasswordlessUserOrCreate(
     c,
