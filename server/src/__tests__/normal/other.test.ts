@@ -150,7 +150,7 @@ describe(
           scopes_supported: Object.values(Scope),
           response_types_supported: ['code'],
           grant_types_supported: Object.values(oauthDto.TokenGrantType),
-          token_endpoint_auth_methods_supported: ['client_secret_basic'],
+          token_endpoint_auth_methods_supported: ['none', 'client_secret_basic'],
           claims_supported: ['sub', 'email', 'first_name', 'last_name', 'locale'],
           id_token_signing_alg_values_supported: ['RS256'],
           jwks_uri: `${serverUrl}/.well-known/jwks.json`,

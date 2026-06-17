@@ -1,5 +1,5 @@
 import {
-  IsEmail, IsNotEmpty, IsString, IsStrongPassword,
+  IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword,
 } from 'class-validator'
 
 export class SignInDto {
@@ -35,8 +35,8 @@ export class SignInWithRecoveryCodeDto {
 
 export class AuthCodeTokenExchangeDto {
   @IsString()
-  @IsNotEmpty()
-    codeVerifier: string
+  @IsOptional()
+    codeVerifier?: string
 
   constructor (dto: AuthCodeTokenExchangeDto) {
     this.codeVerifier = dto.codeVerifier

@@ -47,11 +47,12 @@ export class CoreAuthorizeDto {
     clientId: string
 
   @IsString()
-  @IsNotEmpty()
-    codeChallenge: string
+  @IsOptional()
+    codeChallenge?: string
 
   @IsEnum(AuthorizeCodeChallengeMethod)
-    codeChallengeMethod: string
+  @IsOptional()
+    codeChallengeMethod?: string
 
   @IsString({ each: true })
   @ArrayMinSize(1)
@@ -67,8 +68,10 @@ export class CoreAuthorizeDto {
   constructor (dto: CoreAuthorizeDto) {
     this.redirectUri = dto.redirectUri.toLowerCase()
     this.clientId = dto.clientId
-    this.codeChallenge = dto.codeChallenge
-    this.codeChallengeMethod = dto.codeChallengeMethod?.toLowerCase()
+    this.codeChallenge = dto.codeChallenge || undefined
+    this.codeChallengeMethod = dto.codeChallengeMethod
+      ? dto.codeChallengeMethod.toLowerCase()
+      : undefined
     this.scopes = parseScopes(dto.scopes)
     this.locale = dto.locale
     this.org = dto.org

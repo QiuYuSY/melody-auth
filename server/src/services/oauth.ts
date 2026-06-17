@@ -27,11 +27,12 @@ export const handleAuthCodeTokenExchange = async (
   bodyDto: oauthDto.PostTokenAuthCodeDto,
   options: { persistAuthCode?: boolean } = {},
 ) => {
+  const requiresPkce = !!authInfo.request.codeChallenge
   const { AUTH_CODE_VERIFIER_THRESHOLD: threshold } = env(c)
 
   let ip: string | undefined
   let failedAttempts = 0
-  if (threshold) {
+  if (requiresPkce && threshold) {
     ip = requestUtil.getRequestIP(c)
     failedAttempts = await kvService.getFailedAuthCodeVerifierAttemptsByIP(
       c.env.KV,
@@ -48,26 +49,31 @@ export const handleAuthCodeTokenExchange = async (
     }
   }
 
-  const isValidChallenge = await cryptoUtil.isValidCodeChallenge(
-    bodyDto.codeVerifier,
-    authInfo.request.codeChallenge,
-    authInfo.request.codeChallengeMethod,
-  )
-  if (!isValidChallenge) {
-    if (threshold) {
-      await kvService.setFailedAuthCodeVerifierAttempts(
-        c.env.KV,
-        authInfo.user.id,
-        ip,
-        failedAttempts + 1,
+  if (requiresPkce) {
+    const isValidChallenge = bodyDto.codeVerifier
+      ? await cryptoUtil.isValidCodeChallenge(
+        bodyDto.codeVerifier,
+        authInfo.request.codeChallenge!,
+        authInfo.request.codeChallengeMethod!,
       )
+      : false
+
+    if (!isValidChallenge) {
+      if (threshold) {
+        await kvService.setFailedAuthCodeVerifierAttempts(
+          c.env.KV,
+          authInfo.user.id,
+          ip,
+          failedAttempts + 1,
+        )
+      }
+      loggerUtil.triggerLogger(
+        c,
+        loggerUtil.LoggerLevel.Warn,
+        messageConfig.RequestError.WrongCodeVerifier,
+      )
+      throw new errorConfig.Forbidden(messageConfig.RequestError.WrongCodeVerifier)
     }
-    loggerUtil.triggerLogger(
-      c,
-      loggerUtil.LoggerLevel.Warn,
-      messageConfig.RequestError.WrongCodeVerifier,
-    )
-    throw new errorConfig.Forbidden(messageConfig.RequestError.WrongCodeVerifier)
   }
 
   const {

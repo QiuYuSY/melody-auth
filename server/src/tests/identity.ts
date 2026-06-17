@@ -65,12 +65,24 @@ export const getApp = async (db: Database) => {
 }
 
 export const getAuthorizeParams = async (appRecord: appModel.Record) => {
+  return getAuthorizeParamsWithOptions(
+    appRecord,
+    { withPkce: true },
+  )
+}
+
+export const getAuthorizeParamsWithOptions = async (
+  appRecord: appModel.Record,
+  options?: { withPkce?: boolean },
+) => {
   const codeChallenge = await genCodeChallenge('abc')
   let params = ''
   params += `?client_id=${appRecord.clientId}&redirect_uri=http://localhost:3000/en/dashboard`
   params += '&response_type=code&state=123&locale=en'
   params += '&scope=openid%20profile%20offline_access'
-  params += `&code_challenge_method=S256&code_challenge=${codeChallenge}`
+  if (options?.withPkce !== false) {
+    params += `&code_challenge_method=S256&code_challenge=${codeChallenge}`
+  }
   return params
 }
 
@@ -87,16 +99,42 @@ export const getSignInRequest = async (
   return res
 }
 
-export const postAuthorizeBody = async (appRecord: appModel.Record) => ({
-  clientId: appRecord.clientId,
-  redirectUri: 'http://localhost:3000/en/dashboard',
-  responseType: 'code',
-  state: '123',
-  codeChallengeMethod: 'S256',
-  codeChallenge: await genCodeChallenge('abc'),
-  scope: 'profile openid offline_access',
-  locale: 'en',
-})
+export const postAuthorizeBody = async (appRecord: appModel.Record) => {
+  return postAuthorizeBodyWithOptions(
+    appRecord,
+    { withPkce: true },
+  )
+}
+
+export const postAuthorizeBodyWithOptions = async (
+  appRecord: appModel.Record,
+  options?: { withPkce?: boolean },
+) => {
+  const body = {
+    clientId: appRecord.clientId,
+    redirectUri: 'http://localhost:3000/en/dashboard',
+    responseType: 'code',
+    state: '123',
+    scope: 'profile openid offline_access',
+    locale: 'en',
+  } as {
+    clientId: string;
+    redirectUri: string;
+    responseType: string;
+    state: string;
+    scope: string;
+    locale: string;
+    codeChallengeMethod?: string;
+    codeChallenge?: string;
+  }
+
+  if (options?.withPkce !== false) {
+    body.codeChallengeMethod = 'S256'
+    body.codeChallenge = await genCodeChallenge('abc')
+  }
+
+  return body
+}
 
 export const postSignInRequest = async (
   db: Database,

@@ -18,7 +18,7 @@ import {
   adapterConfig, messageConfig, routeConfig,
 } from 'configs'
 import {
-  getApp, getAuthorizeParams, getSignInRequest, insertUsers, postAuthorizeBody, postSignInRequest,
+  getApp, getAuthorizeParams, getAuthorizeParamsWithOptions, getSignInRequest, insertUsers, postAuthorizeBody, postAuthorizeBodyWithOptions, postSignInRequest,
   prepareFollowUpBody,
 } from 'tests/identity'
 import { oauthDto } from 'dtos'
@@ -54,6 +54,26 @@ describe(
           appRecord,
         )
         const params = await getAuthorizeParams(appRecord)
+        expect(res.status).toBe(302)
+        expect(res.headers.get('Location')).toBe(`${routeConfig.IdentityRoute.AuthorizeView}${params}`)
+      },
+    )
+
+    test(
+      'should redirect to sign in without pkce params',
+      async () => {
+        const appRecord = await getApp(db)
+        const params = await getAuthorizeParamsWithOptions(
+          appRecord,
+          { withPkce: false },
+        )
+
+        const res = await app.request(
+          `${routeConfig.OauthRoute.Authorize}${params}`,
+          {},
+          mock(db),
+        )
+
         expect(res.status).toBe(302)
         expect(res.headers.get('Location')).toBe(`${routeConfig.IdentityRoute.AuthorizeView}${params}`)
       },
@@ -1088,9 +1108,68 @@ export const exchangeWithAuthToken = async (db: Database) => {
   return tokenRes
 }
 
+export const exchangeWithAuthTokenWithoutPkce = async (db: Database) => {
+  const appRecord = await getApp(db)
+
+  const body = {
+    ...(await postAuthorizeBodyWithOptions(
+      appRecord,
+      { withPkce: false },
+    )),
+    email: 'test@email.com',
+    password: 'Password1!',
+    scope: 'profile openid offline_access',
+  }
+
+  const res = await app.request(
+    routeConfig.IdentityRoute.AuthorizePassword,
+    {
+      method: 'POST',
+      body: JSON.stringify(body),
+    },
+    mock(db),
+  )
+  const json = await res.json() as { code: string }
+
+  const tokenRes = await app.request(
+    routeConfig.OauthRoute.Token,
+    {
+      method: 'POST',
+      body: new URLSearchParams({
+        grant_type: oauthDto.TokenGrantType.AuthorizationCode,
+        code: json.code,
+      }).toString(),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    },
+    mock(db),
+  )
+  return tokenRes
+}
+
 describe(
   '/token',
   () => {
+    test(
+      'could get token use auth code without pkce',
+      async () => {
+        global.process.env.ENFORCE_ONE_MFA_ENROLLMENT = [] as unknown as string
+        await insertUsers(db)
+        const tokenRes = await exchangeWithAuthTokenWithoutPkce(db)
+        const tokenJson = await tokenRes.json() as { access_token: string; id_token: string }
+
+        expect(tokenRes.status).toBe(200)
+        expect(tokenJson).toMatchObject({
+          access_token: expect.any(String),
+          token_type: 'Bearer',
+          scope: 'profile openid offline_access',
+          refresh_token: expect.any(String),
+          id_token: expect.any(String),
+        })
+
+        global.process.env.ENFORCE_ONE_MFA_ENROLLMENT = ['email', 'otp'] as unknown as string
+      },
+    )
+
     test(
       'could get token use auth code',
       async () => {
