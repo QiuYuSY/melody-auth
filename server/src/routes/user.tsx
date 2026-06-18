@@ -64,6 +64,34 @@ userRoutes.post(
 
 /**
  * @swagger
+ * /api/v1/users/batch:
+ *   post:
+ *     summary: Create users in batch
+ *     description: Required scope - write_user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               users:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/PostUserReq'
+ *     responses:
+ *       200:
+ *         description: Created users
+ */
+userRoutes.post(
+  `${BaseRoute}/batch`,
+  authMiddleware.s2sWriteUser,
+  userHandler.postUsersBatch,
+)
+
+/**
+ * @swagger
  * /api/v1/users/{authId}:
  *   get:
  *     summary: Get a single user by authId

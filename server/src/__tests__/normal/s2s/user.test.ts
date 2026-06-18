@@ -135,6 +135,126 @@ const insertUserAttributes = async (db: Database) => {
 }
 
 describe(
+  'create batch users',
+  () => {
+    test(
+      'should create users in batch',
+      async () => {
+        await db.prepare('insert into role (name) values (?)').run('test')
+
+        const res = await app.request(
+          `${BaseRoute}/batch`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              users: [
+                {
+                  email: 'batch1@email.com',
+                  password: 'Password1!',
+                  firstName: 'Batch',
+                  lastName: 'One',
+                  roles: ['test'],
+                },
+                {
+                  email: 'batch2@email.com',
+                  password: 'Password1!',
+                  locale: 'fr',
+                  isActive: false,
+                },
+              ],
+            }),
+            headers: { Authorization: `Bearer ${await getS2sToken(db)}` },
+          },
+          mock(db),
+        )
+
+        expect(res.status).toBe(200)
+        const json = await res.json() as { users: userModel.ApiRecordFull[] }
+        expect(json.users).toStrictEqual([
+          {
+            id: 1,
+            authId: expect.any(String),
+            linkedAuthId: null,
+            socialAccountId: null,
+            socialAccountType: null,
+            email: 'batch1@email.com',
+            locale: 'en',
+            emailVerified: true,
+            otpVerified: false,
+            smsPhoneNumberVerified: false,
+            mfaTypes: [],
+            isActive: true,
+            isInviting: false,
+            invitationExpiresAt: null,
+            loginCount: 0,
+            firstName: 'Batch',
+            lastName: 'One',
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+            deletedAt: null,
+            roles: ['test'],
+            attributes: undefined,
+          },
+          {
+            id: 2,
+            authId: expect.any(String),
+            linkedAuthId: null,
+            socialAccountId: null,
+            socialAccountType: null,
+            email: 'batch2@email.com',
+            locale: 'fr',
+            emailVerified: true,
+            otpVerified: false,
+            smsPhoneNumberVerified: false,
+            mfaTypes: [],
+            isActive: false,
+            isInviting: false,
+            invitationExpiresAt: null,
+            loginCount: 0,
+            firstName: null,
+            lastName: null,
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+            deletedAt: null,
+            roles: [],
+            attributes: undefined,
+          },
+        ])
+      },
+    )
+
+    test(
+      'should reject duplicate emails within batch payload',
+      async () => {
+        const res = await app.request(
+          `${BaseRoute}/batch`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              users: [
+                {
+                  email: 'batch@email.com',
+                  password: 'Password1!',
+                },
+                {
+                  email: 'batch@email.com',
+                  password: 'Password1!',
+                },
+              ],
+            }),
+            headers: { Authorization: `Bearer ${await getS2sToken(db)}` },
+          },
+          mock(db),
+        )
+
+        expect(res.status).toBe(400)
+        expect(await res.text()).toBe(messageConfig.RequestError.EmailTaken)
+      },
+    )
+  },
+)
+
+describe(
   'get all',
   () => {
     test(

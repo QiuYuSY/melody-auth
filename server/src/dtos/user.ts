@@ -1,4 +1,6 @@
 import {
+  ArrayMinSize,
+  IsArray,
   IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, IsStrongPassword,
 } from 'class-validator'
 
@@ -87,6 +89,16 @@ export class PostUserDto {
     this.emailVerified = dto.emailVerified
     this.isActive = dto.isActive
     this.roles = dto.roles
+  }
+}
+
+export class PostUsersBatchDto {
+  @IsArray()
+  @ArrayMinSize(1)
+    users: PostUserDto[]
+
+  constructor (dto: PostUsersBatchDto) {
+    this.users = dto.users
   }
 }
 

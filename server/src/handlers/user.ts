@@ -23,43 +23,10 @@ import {
   roleModel, userModel, userRoleModel,
 } from 'models'
 
-export const getUsers = async (c: Context<typeConfig.Context>) => {
-  const {
-    page_size: pageSize,
-    page_number: pageNumber,
-    search,
-  } = c.req.query()
-  const pagination = pageSize && pageNumber
-    ? new PaginationDto({
-      pageSize: Number(pageSize),
-      pageNumber: Number(pageNumber),
-    })
-    : undefined
-
-  const orgId = undefined
-  const result = await userService.getUsers(
-    c,
-    search || undefined,
-    pagination,
-    orgId,
-  )
-  return c.json(result)
-}
-
-export const getUser = async (c: Context<typeConfig.Context>) => {
-  const authId = c.req.param('authId') ?? ''
-  const user = await userService.getUserDetailByAuthId(
-    c,
-    authId,
-  )
-  return c.json({ user })
-}
-
-export const postUser = async (c: Context<typeConfig.Context>) => {
-  const reqBody = await c.req.json()
-  const bodyDto = new userDto.PostUserDto(reqBody)
-  await validateUtil.dto(bodyDto)
-
+const createManagedUser = async (
+  c: Context<typeConfig.Context>,
+  bodyDto: userDto.PostUserDto,
+) => {
   const {
     SUPPORTED_LOCALES: supportedLocales,
     ENABLE_NAMES: enableNames,
@@ -131,7 +98,7 @@ export const postUser = async (c: Context<typeConfig.Context>) => {
   }
 
   const roleNames = targetRoles.map((role) => role.name)
-  const apiRecord = userModel.convertToApiRecordFull(
+  return userModel.convertToApiRecordFull(
     newUser,
     enableNames,
     enableOrg,
@@ -140,8 +107,81 @@ export const postUser = async (c: Context<typeConfig.Context>) => {
     [],
     undefined,
   )
+}
+
+export const getUsers = async (c: Context<typeConfig.Context>) => {
+  const {
+    page_size: pageSize,
+    page_number: pageNumber,
+    search,
+  } = c.req.query()
+  const pagination = pageSize && pageNumber
+    ? new PaginationDto({
+      pageSize: Number(pageSize),
+      pageNumber: Number(pageNumber),
+    })
+    : undefined
+
+  const orgId = undefined
+  const result = await userService.getUsers(
+    c,
+    search || undefined,
+    pagination,
+    orgId,
+  )
+  return c.json(result)
+}
+
+export const getUser = async (c: Context<typeConfig.Context>) => {
+  const authId = c.req.param('authId') ?? ''
+  const user = await userService.getUserDetailByAuthId(
+    c,
+    authId,
+  )
+  return c.json({ user })
+}
+
+export const postUser = async (c: Context<typeConfig.Context>) => {
+  const reqBody = await c.req.json()
+  const bodyDto = new userDto.PostUserDto(reqBody)
+  await validateUtil.dto(bodyDto)
+  const apiRecord = await createManagedUser(
+    c,
+    bodyDto,
+  )
 
   return c.json({ user: apiRecord })
+}
+
+export const postUsersBatch = async (c: Context<typeConfig.Context>) => {
+  const reqBody = await c.req.json()
+  const batchDto = new userDto.PostUsersBatchDto({
+    users: Array.isArray(reqBody.users)
+      ? reqBody.users.map((user: userDto.PostUserDto) => new userDto.PostUserDto(user))
+      : [],
+  })
+  await validateUtil.dto(batchDto)
+  for (const user of batchDto.users) {
+    await validateUtil.dto(user)
+  }
+
+  const seenEmails = new Set<string>()
+  for (const user of batchDto.users) {
+    if (seenEmails.has(user.email)) {
+      throw new errorConfig.Forbidden(messageConfig.RequestError.EmailTaken)
+    }
+    seenEmails.add(user.email)
+  }
+
+  const users = []
+  for (const user of batchDto.users) {
+    users.push(await createManagedUser(
+      c,
+      user,
+    ))
+  }
+
+  return c.json({ users })
 }
 
 export const getUserAppConsents = async (c: Context<typeConfig.Context>) => {
