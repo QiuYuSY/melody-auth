@@ -46,6 +46,13 @@ export const deleteUserAppConsent = async (
 export const createUserAppConsent = async (
   c: Context<typeConfig.Context>, userId: number, appId: number,
 ): Promise<boolean> => {
+  const existingConsent = await userAppConsentModel.getByUserAndApp(
+    c.env.DB,
+    userId,
+    appId,
+  )
+  if (existingConsent) return true
+
   await userAppConsentModel.create(
     c.env.DB,
     {

@@ -275,6 +275,48 @@ describe(
     )
 
     test(
+      'should allow repeat app consent submissions',
+      async () => {
+        process.env.EMBEDDED_AUTH_ORIGINS = ['http://localhost:3000'] as unknown as string
+        process.env.ENFORCE_ONE_MFA_ENROLLMENT = [] as unknown as string
+
+        const { sessionId } = await sendSignUpRequest(
+          db,
+          {
+            email: 'test1@email.com',
+            password: 'Password1!',
+          },
+        )
+
+        const firstRes = await app.request(
+          routeConfig.EmbeddedRoute.AppConsent.replace(
+            ':sessionId',
+            sessionId,
+          ),
+          { method: 'POST' },
+          mock(db),
+        )
+        expect(firstRes.status).toBe(200)
+
+        const secondRes = await app.request(
+          routeConfig.EmbeddedRoute.AppConsent.replace(
+            ':sessionId',
+            sessionId,
+          ),
+          { method: 'POST' },
+          mock(db),
+        )
+        expect(secondRes.status).toBe(200)
+
+        const consents = db.prepare('SELECT * from user_app_consent WHERE "userId" = 1 AND "appId" = 1').all()
+        expect(consents).toHaveLength(1)
+
+        process.env.EMBEDDED_AUTH_ORIGINS = [] as unknown as string
+        process.env.ENFORCE_ONE_MFA_ENROLLMENT = ['email', 'otp'] as unknown as string
+      },
+    )
+
+    test(
       'should throw error when sessionId is not found',
       async () => {
         process.env.EMBEDDED_AUTH_ORIGINS = ['http://localhost:3000'] as unknown as string

@@ -195,10 +195,41 @@ describe(
           redirectUri: 'http://localhost:3000/en/dashboard',
           state: '123',
           scopes: ['profile', 'openid', 'offline_access'],
-          nextPage: routeConfig.View.MfaEnroll,
         })
         const consent = db.prepare('SELECT * from user_app_consent WHERE "userId" = 1 AND "appId" = 1').get()
         expect(consent).toBeTruthy()
+      },
+    )
+
+    test(
+      'should allow repeat consent submissions',
+      async () => {
+        await insertUsers(
+          db,
+          false,
+        )
+        const body = await prepareFollowUpBody(db)
+
+        const firstRes = await app.request(
+          routeConfig.IdentityRoute.AppConsent,
+          {
+            method: 'POST', body: JSON.stringify(body),
+          },
+          mock(db),
+        )
+        expect(firstRes.status).toBe(200)
+
+        const secondRes = await app.request(
+          routeConfig.IdentityRoute.AppConsent,
+          {
+            method: 'POST', body: JSON.stringify(body),
+          },
+          mock(db),
+        )
+        expect(secondRes.status).toBe(200)
+
+        const consents = db.prepare('SELECT * from user_app_consent WHERE "userId" = 1 AND "appId" = 1').all()
+        expect(consents).toHaveLength(1)
       },
     )
 
