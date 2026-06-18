@@ -24,15 +24,10 @@ export class PostAuthorizeWithPasswordDto
   @IsStrongPassword()
     password: string
 
-  @IsString()
-  @IsNotEmpty()
-    accessKey: string
-
   constructor (dto: PostAuthorizeWithPasswordDto) {
     super(dto)
     this.email = dto.email.toLowerCase()
     this.password = dto.password
-    this.accessKey = dto.accessKey.trim()
   }
 }
 
@@ -56,19 +51,18 @@ export class PostAuthorizeWithPasswordlessDto extends oauthDto.GetAuthorizeDto {
   @IsEmail()
     email: string
 
-  @IsString()
-  @IsNotEmpty()
-    accessKey: string
-
   constructor (dto: PostAuthorizeWithPasswordlessDto) {
     super(dto)
     this.email = dto.email.toLowerCase()
-    this.accessKey = dto.accessKey.trim()
   }
 }
 
 export class PostAuthorizeWithNamesDto
   extends PostAuthorizeWithPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+    accessKey: string
+
   @IsString()
   @Length(
     0,
@@ -90,6 +84,7 @@ export class PostAuthorizeWithNamesDto
 
   constructor (dto: PostAuthorizeWithNamesDto) {
     super(dto)
+    this.accessKey = dto.accessKey.trim()
     this.firstName = dto.firstName ?? null
     this.lastName = dto.lastName ?? null
     this.locale = dto.locale
@@ -98,6 +93,10 @@ export class PostAuthorizeWithNamesDto
 
 export class PostAuthorizeWithRequiredNamesDto
   extends PostAuthorizeWithPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+    accessKey: string
+
   @IsString()
   @Length(
     1,
@@ -114,6 +113,7 @@ export class PostAuthorizeWithRequiredNamesDto
 
   constructor (dto: PostAuthorizeWithRequiredNamesDto) {
     super(dto)
+    this.accessKey = dto.accessKey.trim()
     this.firstName = dto.firstName
     this.lastName = dto.lastName
   }

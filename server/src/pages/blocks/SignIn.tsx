@@ -15,16 +15,14 @@ import { bannerModel } from 'models'
 export interface SignInProps {
   locale: typeConfig.Locale;
   onSubmit: (e: Event) => void;
-  onChange: (name: 'email' | 'password' | 'accessKey', value: string) => void;
+  onChange: (name: 'email' | 'password', value: string) => void;
   values: {
     email: string;
     password: string;
-    accessKey: string;
   };
   errors: {
     email: string | undefined;
     password: string | undefined;
-    accessKey: string | undefined;
   };
   submitError: string | null;
   onSwitchView: (view: View) => void;
@@ -114,18 +112,6 @@ const SignIn = ({
               )}
             />
           )}
-          <PasswordField
-            label='Access Key'
-            required
-            name='accessKey'
-            value={values.accessKey}
-            error={errors.accessKey}
-            autoComplete='off'
-            onChange={(value) => onChange(
-              'accessKey',
-              value,
-            )}
-          />
           <SubmitError error={submitError} />
           {initialProps.enablePasswordSignIn && (
             <PrimaryButton

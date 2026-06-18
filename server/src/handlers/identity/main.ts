@@ -48,12 +48,6 @@ export const postAuthorizePassword = async (c: Context<typeConfig.Context>) => {
   })
   await validateUtil.dto(bodyDto)
 
-  const { ACCESS_KEY } = env(c)
-  verifyAccessKey(
-    bodyDto.accessKey,
-    ACCESS_KEY,
-  )
-
   const user = await userService.verifyPasswordSignIn(
     c,
     bodyDto,
