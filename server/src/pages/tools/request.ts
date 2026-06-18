@@ -113,6 +113,12 @@ export const handleAuthorizeStep = (
         },
         redirectUrl.origin,
       )
+      window.setTimeout(
+        () => {
+          window.location.href = redirectUrl.toString()
+        },
+        50,
+      )
     } else {
       window.location.href = redirectUrl.toString()
     }

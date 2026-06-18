@@ -130,6 +130,13 @@ describe(
           )
           // Mock window.history
           window.history.pushState = vi.fn()
+          vi.spyOn(
+            window,
+            'setTimeout',
+          ).mockImplementation(((fn: TimerHandler) => {
+            if (typeof fn === 'function') fn()
+            return 0 as unknown as number
+          }) as typeof window.setTimeout)
         })
 
         test(
@@ -227,6 +234,7 @@ describe(
               },
               'http://example.com',
             )
+            expect(window.location.href).toBe('http://example.com/callback?state=state123&code=code123&locale=en&org=org123')
           },
         )
 
@@ -317,6 +325,7 @@ describe(
               },
               'http://example.com',
             )
+            expect(window.location.href).toBe('http://example.com/callback?state=state123&code=code123&locale=en&org=')
 
             // Clear mock
             vi.clearAllMocks()
@@ -346,6 +355,7 @@ describe(
               },
               'http://example.com',
             )
+            expect(window.location.href).toBe('http://example.com/callback?state=state123&code=code123&locale=en&org=')
           },
         )
 
