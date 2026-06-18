@@ -7,6 +7,8 @@ const PopupRedirect = ({
   queryDto: oauthDto.GetAuthorizeDto;
   code: string;
 }) => {
+  const redirectOrigin = new URL(queryDto.redirectUri).origin
+
   return (
     <html>
       <body>
@@ -21,7 +23,7 @@ const PopupRedirect = ({
                   locale: "${queryDto.locale}",
                   org: "${queryDto.org ?? ''}",
                   redirectUri: "${queryDto.redirectUri}",
-                }, "${queryDto.redirectUri}");
+                }, "${redirectOrigin}");
               }
             </script>
           `}

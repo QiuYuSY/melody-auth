@@ -84,6 +84,24 @@ export const handleAuthorizeStep = (
     }
     onSwitchView(step)
   } else {
+    const redirectUrl = new URL(data.redirectUri)
+    redirectUrl.searchParams.set(
+      'state',
+      data.state,
+    )
+    redirectUrl.searchParams.set(
+      'code',
+      data.code,
+    )
+    redirectUrl.searchParams.set(
+      'locale',
+      locale,
+    )
+    redirectUrl.searchParams.set(
+      'org',
+      data.org ?? '',
+    )
+
     if (window.opener) {
       window.opener.postMessage(
         {
@@ -93,12 +111,10 @@ export const handleAuthorizeStep = (
           org: data.org ?? '',
           redirectUri: data.redirectUri,
         },
-        data.redirectUri,
+        redirectUrl.origin,
       )
     } else {
-      const queryString = `?state=${data.state}&code=${data.code}&locale=${locale}&org=${data.org ?? ''}`
-      const url = `${data.redirectUri}${queryString}`
-      window.location.href = url
+      window.location.href = redirectUrl.toString()
     }
   }
 }

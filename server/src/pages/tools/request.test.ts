@@ -197,7 +197,7 @@ describe(
             const data = {
               state: 'state123',
               code: 'code123',
-              redirectUri: 'http://example.com',
+              redirectUri: 'http://example.com/callback',
               org: 'org123',
             }
 
@@ -223,7 +223,7 @@ describe(
                 code: 'code123',
                 locale: 'en',
                 org: 'org123',
-                redirectUri: 'http://example.com',
+                redirectUri: 'http://example.com/callback',
               },
               'http://example.com',
             )
@@ -236,7 +236,7 @@ describe(
             const data = {
               state: 'state123',
               code: 'code123',
-              redirectUri: 'http://example.com',
+              redirectUri: 'http://example.com/callback',
               org: 'org123',
             }
 
@@ -256,7 +256,7 @@ describe(
               onSwitchView,
             )
 
-            expect(window.location.href).toBe('http://example.com?state=state123&code=code123&locale=en&org=org123')
+            expect(window.location.href).toBe('http://example.com/callback?state=state123&code=code123&locale=en&org=org123')
           },
         )
 
@@ -266,7 +266,7 @@ describe(
             const data = {
               state: 'state123',
               code: 'code123',
-              redirectUri: 'http://example.com',
+              redirectUri: 'http://example.com/callback',
             }
 
             handleAuthorizeStep(
@@ -275,7 +275,7 @@ describe(
               onSwitchView,
             )
 
-            expect(window.location.href).toBe('http://example.com?state=state123&code=code123&locale=en&org=')
+            expect(window.location.href).toBe('http://example.com/callback?state=state123&code=code123&locale=en&org=')
           },
         )
 
@@ -286,7 +286,7 @@ describe(
             const dataUndefined = {
               state: 'state123',
               code: 'code123',
-              redirectUri: 'http://example.com',
+              redirectUri: 'http://example.com/callback',
               org: undefined,
             }
 
@@ -313,7 +313,7 @@ describe(
                 code: 'code123',
                 locale: 'en',
                 org: '',
-                redirectUri: 'http://example.com',
+                redirectUri: 'http://example.com/callback',
               },
               'http://example.com',
             )
@@ -325,7 +325,7 @@ describe(
             const dataNull = {
               state: 'state123',
               code: 'code123',
-              redirectUri: 'http://example.com',
+              redirectUri: 'http://example.com/callback',
               org: null,
             }
 
@@ -342,10 +342,39 @@ describe(
                 code: 'code123',
                 locale: 'en',
                 org: '',
-                redirectUri: 'http://example.com',
+                redirectUri: 'http://example.com/callback',
               },
               'http://example.com',
             )
+          },
+        )
+
+        test(
+          'preserves existing redirect query parameters',
+          () => {
+            const data = {
+              state: 'state123',
+              code: 'code123',
+              redirectUri: 'http://example.com/callback?from_portal=true',
+              org: 'org123',
+            }
+
+            Object.defineProperty(
+              window,
+              'opener',
+              {
+                value: null,
+                writable: true,
+              },
+            )
+
+            handleAuthorizeStep(
+              data,
+              locale,
+              onSwitchView,
+            )
+
+            expect(window.location.href).toBe('http://example.com/callback?from_portal=true&state=state123&code=code123&locale=en&org=org123')
           },
         )
       },
